@@ -11,6 +11,7 @@ class StoryPermutationValidator:
         # Download necessary NLTK resources
         nltk.download('punkt', quiet=True)
         nltk.download('stopwords', quiet=True)
+        nltk.download('punkt_tab', quiet=True)
         
         # Load spaCy language model for linguistic analysis
         self.nlp = spacy.load('en_core_web_sm')
