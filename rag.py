@@ -232,6 +232,7 @@ from langchain_core.documents import Document
 # Load environment variables
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
+load_dotenv(override=True)
 
 # Initialize Pinecone with new API
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))

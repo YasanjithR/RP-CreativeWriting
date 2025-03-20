@@ -12,6 +12,7 @@ class NarrativeContinuationGenerator:
     def __init__(self):
         # Load environment variables
         load_dotenv(find_dotenv())
+        load_dotenv(override=True)
 
         # Initialize AI models
         self.embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
