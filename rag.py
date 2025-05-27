@@ -221,7 +221,7 @@
 
 import os
 from dotenv import load_dotenv, find_dotenv
-from pinecone import Pinecone, ServerlessSpec
+from pinecone import Pinecone
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
@@ -234,7 +234,7 @@ dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 load_dotenv(override=True)
 
-# Initialize Pinecone with new API
+# Initialize Pinecone with current API
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
 # Initialize embedding and LLM
@@ -253,15 +253,11 @@ def create_pinecone_index(index_name="story", dimension=1536):
     existing_indexes = pc.list_indexes().names()
     
     if index_name not in existing_indexes:
-        # Create serverless index
+        # Create index
         pc.create_index(
             name=index_name,
             dimension=dimension,
-            metric='cosine',
-            spec=ServerlessSpec(
-                cloud='aws',
-                region='us-west-2'
-            )
+            metric='cosine'
         )
     
     return pc.Index(index_name)
