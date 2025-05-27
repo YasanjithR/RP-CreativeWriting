@@ -155,7 +155,7 @@ class NarrativeContinuationGenerator:
         if not continuation_prompt:
             continuation_prompt = "Continue the story, maintaining the established narrative and characters"
 
-        # Create a sophisticated prompt for story continuation
+        # Create a sophisticated prompt for story continuation with controlled length
         full_prompt = ChatPromptTemplate.from_template("""
         Story Continuation Parameters:
         - Complexity Level: {complexity_level}
@@ -178,11 +178,18 @@ class NarrativeContinuationGenerator:
 
         Continuation Prompt: {continuation_prompt}
 
+        IMPORTANT FORMATTING INSTRUCTIONS:
+        - Generate a SHORT continuation with exactly 3-5 sentences
+        - Keep sentences relatively simple and somewhat interchangeable
+        - Focus on simple narrative structure rather than complex cause-and-effect
+        - Sentences should be self-contained but related to the overall theme
+        - Do NOT number the sentences or add a title
+
         Generate the next segment of the story, ensuring:
         - Seamless narrative flow
         - Character consistency
         - Thematic coherence
-        - Complexity progression aligned with creativity and validity scores
+        - Appropriate complexity for the specified level
         """)
 
         # Create a chain with the prompt and output parser
@@ -211,11 +218,11 @@ def main():
     # Initialize the generator
     generator = NarrativeContinuationGenerator()
 
-    # Simulate a previous story
+    # Simulate a previous story - intentionally kept short with few sentences
     previous_story = """
     In a world where time was a fabric that could be woven, young Aria discovered she had the rare ability to see temporal threads. 
-    Her first glimpse came on her 12th birthday when a mysterious crystal appeared in her grandmother's attic, 
-    revealing whispers of forgotten timelines and potential futures.
+    Her first glimpse came on her 12th birthday when a mysterious crystal appeared in her grandmother's attic.
+    The crystal revealed whispers of forgotten timelines and potential futures.
     """
 
     # Generate the next story iteration with explicit creativity and validity scores
@@ -228,11 +235,22 @@ def main():
         continuation_prompt="Explore Aria's first attempt to manipulate time threads"
     )
 
-    print("Story Continuation:")
+    print("Original Story (3 sentences):")
+    print(previous_story.strip())
+    
+    print("\nStory Continuation (3-5 sentences):")
     print(next_story_iteration['story_continuation'])
+    
     print("\nComplexity Level:", next_story_iteration['complexity_level'])
-    print("\nComplexity History:")
-    print(json.dumps(next_story_iteration['complexity_history'], indent=2))
+    
+    # Count sentences in continuation
+    sentence_count = len(next_story_iteration['story_continuation'].split('.'))
+    sentence_count = sum(1 for s in next_story_iteration['story_continuation'].split('.') if s.strip())
+    print(f"Sentences in continuation: {sentence_count}")
+    
+    print("\nExtracted Narrative Elements:")
+    print("Characters:", next_story_iteration['narrative_context']['characters'].keys())
+    print("Themes:", next_story_iteration['narrative_context']['themes'])
 
 if __name__ == "__main__":
     main()

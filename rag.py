@@ -372,7 +372,7 @@ def retrieve_similar_stories(index, embedding_model, query, top_k=3):
     
     return contexts
 
-def generate_story_adventure(llm, contexts, user_query):
+def generate_story_adventure(llm, contexts, user_query, short_story=False):
     """
     Generate a story adventure using LLM
     
@@ -380,21 +380,38 @@ def generate_story_adventure(llm, contexts, user_query):
         llm: Language model
         contexts (list): Retrieved story contexts as Document objects
         user_query (str): Original user query
+        short_story (bool): Whether to generate a short story with interchangeable sentences
     
     Returns:
         str: Generated story adventure
     """
     # Construct prompt
-    prompt_template = ChatPromptTemplate.from_template("""
-    You are a creative assistant helping to create stories for children.
+    if short_story:
+        prompt_template = ChatPromptTemplate.from_template("""
+        You are a creative assistant helping to create short stories for children.
 
-    Retrieved Story Contexts:
-    {context}
+        Retrieved Story Contexts:
+        {context}
 
-    User Query: {input}
+        User Query: {input}
 
-    Generate an engaging and imaginative adventure that connects with the retrieved story contexts.
-    """)
+        Generate a SHORT story with exactly 3-5 sentences. 
+        The sentences should be somewhat interchangeable, meaning they could potentially be rearranged while still making sense.
+        Focus on simple narrative structure rather than complex cause-and-effect relationships.
+        Keep each sentence self-contained but related to the overall theme.
+        Do NOT number the sentences or add a title.
+        """)
+    else:
+        prompt_template = ChatPromptTemplate.from_template("""
+        You are a creative assistant helping to create stories for children.
+
+        Retrieved Story Contexts:
+        {context}
+
+        User Query: {input}
+
+        Generate an engaging and imaginative adventure that connects with the retrieved story contexts.
+        """)
     
     # Create document chain
     document_chain = create_stuff_documents_chain(llm, prompt_template)
@@ -426,10 +443,17 @@ def main():
     # Retrieve similar stories
     contexts = retrieve_similar_stories(index, embedding_model, user_query)
     
-    # Generate adventure
+    # Generate standard adventure
     adventure = generate_story_adventure(llm, contexts, user_query)
+    print("\n=== Standard Adventure ===")
+    print(adventure)
     
-    print("Generated Adventure:", adventure)
+    # Generate short permutable story
+    short_story_query = "Create a story about a magical forest with talking animals"
+    short_story = generate_story_adventure(llm, contexts, short_story_query, short_story=True)
+    print("\n=== Short Permutable Story ===")
+    print(short_story)
+    print("\nThis short story has interchangeable sentences suitable for permutation.")
 
 if __name__ == "__main__":
     main()

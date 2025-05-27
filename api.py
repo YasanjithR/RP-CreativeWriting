@@ -67,6 +67,10 @@ class StoryParameters(BaseModel):
         default=None,
         description="Any additional context or requirements for the story"
     )
+    short_permutable: bool = Field(
+        default=False,
+        description="Whether to generate a short story with interchangeable sentences (4-7 sentences)"
+    )
 
 class StoryResponse(BaseModel):
     story: str = Field(..., description="Generated story")
@@ -170,8 +174,8 @@ async def generate_story(
         # Retrieve relevant story contexts
         contexts = retrieve_similar_stories(pinecone_index, embedding_model, query)
         
-        # Generate the story
-        story = generate_story_adventure(llm, contexts, query)
+        # Generate the story, using short_permutable parameter for interchangeable sentences
+        story = generate_story_adventure(llm, contexts, query, short_story=params.short_permutable)
         
         # Format used contexts for response
         used_contexts = []
@@ -276,7 +280,7 @@ class StoryContinuationRequest(BaseModel):
     continuation_prompt: str = Field(..., description="Specific prompt for continuing the story")
 
 class StoryContinuationResponse(BaseModel):
-    story_continuation: str = Field(..., description="Generated continuation of the story")
+    story_continuation: str = Field(..., description="Generated short continuation with 3-5 interchangeable sentences")
     complexity_level: int = Field(..., description="Calculated complexity level (1-5)")
     narrative_context: Dict = Field(..., description="Extracted narrative elements")
     complexity_history: Dict = Field(..., description="Complexity scoring history")
@@ -284,7 +288,7 @@ class StoryContinuationResponse(BaseModel):
 @app.post("/continue-story", response_model=StoryContinuationResponse)
 async def continue_story(request: StoryContinuationRequest):
     """
-    Generate a continuation of a story using adaptive complexity
+    Generate a short continuation of a story using adaptive complexity
     
     Parameters:
     - previous_story: The story text to continue from
@@ -293,10 +297,13 @@ async def continue_story(request: StoryContinuationRequest):
     - continuation_prompt: Specific prompt for continuing the story
     
     Returns:
-    - story_continuation: Generated continuation of the story
+    - story_continuation: Generated short continuation with 3-5 interchangeable sentences
     - complexity_level: Calculated complexity level (1-5)
-    - narrative_context: Extracted narrative elements
+    - narrative_context: Extracted narrative elements from the story
     - complexity_history: Complexity scoring history
+    
+    Note: The continuation will be a short 3-5 sentence segment that maintains the narrative 
+    elements while keeping sentences somewhat interchangeable for permutation exercises.
     """
     try:
         # Create scores dictionary from individual parameters
@@ -316,6 +323,54 @@ async def continue_story(request: StoryContinuationRequest):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating story continuation: {str(e)}")
+
+# API endpoint to generate a short, permutable story
+class ShortStoryRequest(BaseModel):
+    theme: str = Field(..., description="Theme of the short story")
+    characters: Optional[str] = Field(default=None, description="Characters in the story")
+    setting: Optional[str] = Field(default=None, description="Setting of the story")
+
+class ShortStoryResponse(BaseModel):
+    story: str = Field(..., description="Generated short story with interchangeable sentences")
+
+@app.post("/short-permutable-story", response_model=ShortStoryResponse)
+async def generate_short_permutable_story(request: ShortStoryRequest):
+    """
+    Generate a short story (4-7 sentences) with interchangeable sentences suitable for permutation
+    
+    Parameters:
+    - theme: Theme of the short story
+    - characters: Optional characters in the story
+    - setting: Optional setting of the story
+    
+    Returns:
+    - story: Generated short story with interchangeable sentences
+    """
+    try:
+        # Construct a simple query from the request
+        query_parts = []
+        if request.theme:
+            query_parts.append(f"about {request.theme}")
+        if request.characters:
+            query_parts.append(f"featuring {request.characters}")
+        if request.setting:
+            query_parts.append(f"set in {request.setting}")
+        
+        query = "Create a short story " + " ".join(query_parts)
+        
+        # Get contexts - may not have indexed data, so handle empty results
+        try:
+            contexts = retrieve_similar_stories(pinecone_index, embedding_model, query)
+        except:
+            contexts = []
+        
+        # Generate a short, permutable story
+        story = generate_story_adventure(llm, contexts, query, short_story=True)
+        
+        return {"story": story}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating short permutable story: {str(e)}")
 
 # Health check endpoint
 @app.get("/health")
