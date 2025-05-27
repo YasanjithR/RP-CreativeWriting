@@ -388,29 +388,43 @@ def generate_story_adventure(llm, contexts, user_query, short_story=False):
     # Construct prompt
     if short_story:
         prompt_template = ChatPromptTemplate.from_template("""
-        You are a creative assistant helping to create short stories for children.
+        You are a creative assistant helping to create very simple, short stories for young children (ages 5-7).
 
         Retrieved Story Contexts:
         {context}
 
         User Query: {input}
 
-        Generate a SHORT story with exactly 3-5 sentences. 
-        The sentences should be somewhat interchangeable, meaning they could potentially be rearranged while still making sense.
-        Focus on simple narrative structure rather than complex cause-and-effect relationships.
-        Keep each sentence self-contained but related to the overall theme.
+        Generate a VERY SIMPLE short story with exactly 3-5 sentences.
+        Important requirements:
+        - Use extremely simple vocabulary suitable for young children
+        - Keep sentences short (10-15 words maximum)
+        - Use simple subject-verb-object structure
+        - Avoid complex words, metaphors, or abstract concepts
+        - Use only basic punctuation
+        - The sentences should be completely interchangeable in order
+        - Each sentence should be self-contained and make sense on its own
+        - Focus on concrete, visual elements rather than abstract ideas
+        - Use a reading level appropriate for ages 5-7
+        
         Do NOT number the sentences or add a title.
         """)
     else:
         prompt_template = ChatPromptTemplate.from_template("""
-        You are a creative assistant helping to create stories for children.
+        You are a creative assistant helping to create simple stories for children ages 7-10.
 
         Retrieved Story Contexts:
         {context}
 
         User Query: {input}
 
-        Generate an engaging and imaginative adventure that connects with the retrieved story contexts.
+        Generate a simple, easy-to-understand story with the following characteristics:
+        - Use simple vocabulary and short sentences (15-20 words maximum)
+        - Avoid complex sentence structures or advanced vocabulary
+        - Focus on concrete actions and descriptions rather than abstract ideas
+        - Keep the narrative straightforward with a clear beginning, middle, and end
+        - Use a reading level appropriate for ages 7-10
+        - Limit to 10-15 sentences total
         """)
     
     # Create document chain

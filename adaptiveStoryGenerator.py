@@ -179,17 +179,24 @@ class NarrativeContinuationGenerator:
         Continuation Prompt: {continuation_prompt}
 
         IMPORTANT FORMATTING INSTRUCTIONS:
-        - Generate a SHORT continuation with exactly 3-5 sentences
-        - Keep sentences relatively simple and somewhat interchangeable
-        - Focus on simple narrative structure rather than complex cause-and-effect
-        - Sentences should be self-contained but related to the overall theme
+        - Generate a VERY SIMPLE continuation with exactly 3-5 sentences
+        - Use extremely simple vocabulary suitable for young children (ages 5-7)
+        - Keep sentences very short (10-15 words maximum)
+        - Use simple subject-verb-object structure only
+        - Avoid all complex words, metaphors, or abstract concepts
+        - Use only basic punctuation
+        - The sentences must be completely interchangeable in order
+        - Each sentence should be self-contained and make sense on its own
+        - Focus only on concrete, visual elements that children can easily picture
+        - Use a reading level appropriate for ages 5-7
         - Do NOT number the sentences or add a title
 
         Generate the next segment of the story, ensuring:
-        - Seamless narrative flow
-        - Character consistency
-        - Thematic coherence
-        - Appropriate complexity for the specified level
+        - Very simple vocabulary and sentence structure
+        - Character consistency using simple descriptions
+        - Concrete actions and visual descriptions only
+        - No advanced vocabulary or complex narrative devices
+        - Short, clear sentences that young children can easily read
         """)
 
         # Create a chain with the prompt and output parser
@@ -218,11 +225,11 @@ def main():
     # Initialize the generator
     generator = NarrativeContinuationGenerator()
 
-    # Simulate a previous story - intentionally kept short with few sentences
+    # Simulate a previous story - intentionally kept very simple
     previous_story = """
-    In a world where time was a fabric that could be woven, young Aria discovered she had the rare ability to see temporal threads. 
-    Her first glimpse came on her 12th birthday when a mysterious crystal appeared in her grandmother's attic.
-    The crystal revealed whispers of forgotten timelines and potential futures.
+    Aria found a magic crystal on her birthday. 
+    The crystal glowed with bright blue light.
+    Aria could see magic threads coming from the crystal.
     """
 
     # Generate the next story iteration with explicit creativity and validity scores
@@ -232,7 +239,7 @@ def main():
             'creativity_score': 0.7,  # High creativity
             'validity_score': 0.6     # Moderate validity
         },
-        continuation_prompt="Explore Aria's first attempt to manipulate time threads"
+        continuation_prompt="Aria touches one of the magic threads"
     )
 
     print("Original Story (3 sentences):")
