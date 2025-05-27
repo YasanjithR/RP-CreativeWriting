@@ -6,6 +6,7 @@ def download_resources():
     print("Downloading NLTK resources...")
     nltk.download('punkt')
     nltk.download('stopwords')
+    nltk.download('punkt_tab') 
     
     print("Downloading spaCy resources...")
     subprocess.call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
